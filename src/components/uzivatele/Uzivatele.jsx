@@ -3,9 +3,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ListUzivatele from "./ListUzivatele";
 import VytvorUzivatel from "./VytvorUzivatel";
 
-export default function Uzivatele() {
+export default function Uzivatele(props) {
 
     const [zobrazeni, setZobrazeni] = useState("list");
+    const prihlasen = props.prihlasen;
 
     const zmenZobrazeni = (hodnota) => {
         setZobrazeni(hodnota);
@@ -19,8 +20,8 @@ export default function Uzivatele() {
                         <div className={"card"}>
                             <div className={"card-body text-center"}>
                                 <h2 className={""}>Uživatelé</h2>
-                                {zobrazeni === "list" && <ListUzivatele onVytvor={() => zmenZobrazeni("list")} />}
-                                {zobrazeni === "list" && <button className={"btn btn-primary"} onClick={() => zmenZobrazeni("vytvoreni")}>
+                                {zobrazeni === "list" && <ListUzivatele prihlasen={prihlasen} />}
+                                {zobrazeni === "list" && prihlasen === "admin" && <button className={"btn btn-primary"} onClick={() => zmenZobrazeni("vytvoreni")}>
                                     Nový
                                 </button>}
                                 {zobrazeni === "vytvoreni" && (<VytvorUzivatel onVytvor={() => zmenZobrazeni("list")} />)}

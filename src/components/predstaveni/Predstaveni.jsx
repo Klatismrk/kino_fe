@@ -3,9 +3,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ListPredstaveni from "./ListPredstaveni";
 import VytvorPredstaveni from "./VytvorPredstaveni";
 
-export default function Predstaveni() {
+export default function Predstaveni(props) {
 
     const [zobrazeni, setZobrazeni] = useState("list");
+    const prihlasen = props.prihlasen;
 
     const zmenZobrazeni = (hodnota) => {
         setZobrazeni(hodnota);
@@ -19,8 +20,8 @@ export default function Predstaveni() {
                             <div className={"card"}>
                                 <div className={"card-body text-center"}>
                                     <h2 className={""}>Představení</h2>
-                                    {zobrazeni === "list" && <ListPredstaveni onVytvor={() => zmenZobrazeni("list")} />}
-                                    {zobrazeni === "list" && <button className={"btn btn-primary"} onClick={() => zmenZobrazeni("vytvoreni")}>
+                                    {zobrazeni === "list" && <ListPredstaveni prihlasen={prihlasen} />}
+                                    {zobrazeni === "list" && prihlasen === "admin" && <button className={"btn btn-primary"} onClick={() => zmenZobrazeni("vytvoreni")}>
                                         Nové
                                     </button>}
                                     {zobrazeni === "vytvoreni" && (<VytvorPredstaveni onVytvor={() => zmenZobrazeni("list")} />)}

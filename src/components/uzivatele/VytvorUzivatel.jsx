@@ -6,9 +6,10 @@ const VytvorUzivatel = ({ onVytvor }) => {
     const [login, setLogin] = useState('');
     const [jmeno, setJmeno] = useState('');
     const [heslo, setHeslo] = useState('');
+    const [role, setRole] = useState('');
 
     const handleAddEntity = () => {
-        if (!login || !jmeno || !heslo) {
+        if (!login || !jmeno || !heslo || !role) {
             alert('Vyplňte všechny údaje.');
             return;
         }
@@ -17,15 +18,18 @@ const VytvorUzivatel = ({ onVytvor }) => {
             login,
             jmeno,
             heslo,
+            role,
         };
 
         // Odeslání dat na API pomocí POST požadavku
-        axios.post('http://localhost:8080/api/uzivatel', newEntity)
+        axios.post('http://localhost:8080/api/uzivatel', newEntity, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(response => {
                 // Zpracování odpovědi z API
                 console.log('Uživatel byl úspěšně vytvořeno', response.data);
-                // Volání funkce pro manipulaci s daty ve vaší aplikaci (pokud je to vhodné)
-                onVytvor(response.data);
             })
             .catch(error => {
                 // Zpracování chyby při odesílání na API
@@ -36,6 +40,7 @@ const VytvorUzivatel = ({ onVytvor }) => {
         setJmeno('');
         setLogin('');
         setHeslo('');
+        setRole('');
         alert('Vytvořeno');
         onVytvor();
     };
@@ -57,6 +62,14 @@ const VytvorUzivatel = ({ onVytvor }) => {
                     <label className="form-label">Heslo:</label>
                     <input className="form-control" type="password" value={heslo}
                            onChange={(e) => setHeslo(e.target.value)}/>
+                </div>
+                <div className={"mb-3"}>
+                    <label className="form-label">Role:</label>
+                    <select className="form-select" value={role} onChange={(e) => setRole(e.target.value)}>
+                        <option value="" disabled>Vyberte roli</option>
+                        <option key={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>Admin</option>
+                        <option key={"ROLE_UZIVATEL"} value={"ROLE_UZIVATEL"}>Uzivatel</option>
+                    </select>
                 </div>
             </form>
             <div className={"d-flex justify-content-around mt-4"}>

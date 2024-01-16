@@ -18,12 +18,14 @@ const VytvorFilm = ({ onVytvor }) => {
         };
 
         // Odeslání dat na API pomocí POST požadavku
-        axios.post('http://localhost:8080/api/film', newEntity)
+        axios.post('http://localhost:8080/api/film', newEntity, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(response => {
                 // Zpracování odpovědi z API
                 console.log('Film byl úspěšně vytvořeno', response.data);
-                // Volání funkce pro manipulaci s daty ve vaší aplikaci (pokud je to vhodné)
-                onVytvor(response.data);
             })
             .catch(error => {
                 // Zpracování chyby při odesílání na API

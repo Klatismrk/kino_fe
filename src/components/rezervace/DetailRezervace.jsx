@@ -3,13 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import moment from "moment/moment";
 
-function DetailRezervace() {
+function DetailRezervace(props) {
     const navigate = useNavigate();
     const { id } = useParams();
     const [entity, setEntity] = useState({});
+    const prihlasen = props.prihlasen;
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/rezervace/${id}`)
+        axios.get(`http://localhost:8080/api/rezervace/${id}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -20,7 +25,11 @@ function DetailRezervace() {
     }, [id]);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/rezervace/${entityId}`)
+        axios.delete(`http://localhost:8080/api/rezervace/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 navigate("/rezervace");
             })
@@ -42,9 +51,9 @@ function DetailRezervace() {
                                 Datum: {moment(entity.predstaveni?.datum).format('DD.MM.YYYY HH:mm')}
                             </p>
                             <div className={"d-flex justify-content-around mt-4"}>
-                                <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
+                                {(prihlasen === "admin" || prihlasen === "uzivatel") && <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
                                     Smazat
-                                </button>
+                                </button>}
                                 <button className="btn btn-danger" onClick={() => navigate("/rezervace")}>
                                     Zpět
                                 </button>

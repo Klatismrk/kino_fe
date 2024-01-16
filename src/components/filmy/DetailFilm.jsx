@@ -2,13 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function DetailFilm() {
+function DetailFilm(props) {
     const navigate = useNavigate();
     const { id } = useParams();
     const [entity, setEntity] = useState({});
+    const prihlasen = props.prihlasen;
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/film/${id}`)
+        axios.get(`http://localhost:8080/api/film/${id}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -19,7 +24,11 @@ function DetailFilm() {
     }, [id]);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/film/${entityId}`)
+        axios.delete(`http://localhost:8080/api/film/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 navigate("/filmy");
             })
@@ -37,12 +46,12 @@ function DetailFilm() {
                             <h1>{entity.nazev}</h1>
                             <p>{entity.popis}</p>
                             <div className={"d-flex justify-content-around mt-4"}>
-                            <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
-                                Smazat
-                            </button>
-                            <button className="btn btn-danger" onClick={() => navigate("/filmy")}>
-                                Zpět
-                            </button>
+                                {prihlasen === "admin" && <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
+                                    Smazat
+                                </button>}
+                                <button className="btn btn-danger" onClick={() => navigate("/filmy")}>
+                                    Zpět
+                                </button>
                             </div>
                         </div>
                     </div>

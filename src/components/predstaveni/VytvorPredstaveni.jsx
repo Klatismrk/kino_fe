@@ -10,7 +10,11 @@ const VytvorPredstaveni = ({ onVytvor }) => {
 
     // Načtení filmů z API při načtení komponenty
     useEffect(() => {
-        axios.get('http://localhost:8080/api/film')
+        axios.get('http://localhost:8080/api/film', {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(response => setFilmy(response.data))
             .catch(error => console.error('Chyba při načítání filmů', error));
     }, []); // [] zajišťuje, že se načtou filmy pouze při prvním načtení komponenty
@@ -35,12 +39,14 @@ const VytvorPredstaveni = ({ onVytvor }) => {
         console.log('Odesílaný požadavek:', newEntity);
 
         // Odeslání dat na API pomocí POST požadavku
-        axios.post('http://localhost:8080/api/predstaveni', newEntity)
+        axios.post('http://localhost:8080/api/predstaveni', newEntity, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(response => {
                 // Zpracování odpovědi z API
                 console.log('Představení bylo úspěšně vytvořeno', response.data);
-                // Volání funkce pro manipulaci s daty ve vaší aplikaci (pokud je to vhodné)
-                onVytvor(response.data);
             })
             .catch(error => {
                 // Zpracování chyby při odesílání na API
@@ -79,12 +85,12 @@ const VytvorPredstaveni = ({ onVytvor }) => {
                 </div>
             </form>
             <div className={"d-flex justify-content-around mt-4"}>
-            <button className={"btn btn-primary"} type="button" onClick={() => handleAddEntity()}>
-                Přidat představení
-            </button>
-            <button className={"btn btn-danger"} onClick={() => onVytvor()}>
-                zpět
-            </button>
+                <button className={"btn btn-primary"} type="button" onClick={() => handleAddEntity()}>
+                    Přidat představení
+                </button>
+                <button className={"btn btn-danger"} onClick={() => onVytvor()}>
+                    zpět
+                </button>
             </div>
         </>
     );

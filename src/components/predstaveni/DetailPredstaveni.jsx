@@ -4,13 +4,19 @@ import axios from 'axios';
 import moment from "moment/moment";
 import SedadlaGenerator from "./SalGenerator";
 
-function DetailPredstaveni() {
+function DetailPredstaveni(props) {
     const navigate = useNavigate();
     const { id } = useParams();
     const [entity, setEntity] = useState({});
+    const prihlasen = props.prihlasen;
+    const loggedIn = props.loggedIn;
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/predstaveni/${id}`)
+        axios.get(`http://localhost:8080/api/predstaveni/${id}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -21,7 +27,11 @@ function DetailPredstaveni() {
     }, [id]);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/predstaveni/${entityId}`)
+        axios.delete(`http://localhost:8080/api/predstaveni/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 navigate("/predstaveni");
             })
@@ -39,14 +49,14 @@ function DetailPredstaveni() {
                             <h1>{entity.film?.nazev}</h1>
                             <h2>{moment(entity.datum).format('DD.MM.YYYY HH:mm')}</h2>
                             <p>{entity.film?.popis}</p>
-                            <SedadlaGenerator pocetRad={3} pocetSloupcu={6} predstaveniId={id}/>
+                            {loggedIn && <SedadlaGenerator prihlasen={prihlasen} pocetRad={3} pocetSloupcu={6} predstaveniId={id}/>}
                             <div className={"d-flex justify-content-around mt-4"}>
-                            <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
-                                Smazat
-                            </button>
-                            <button className="btn btn-danger" onClick={() => navigate("/predstaveni")}>
-                                Zpět
-                            </button>
+                                {prihlasen === "admin" && <button className="btn btn-danger" onClick={() => deleteEntity(entity.id)}>
+                                    Smazat
+                                </button>}
+                                <button className="btn btn-danger" onClick={() => navigate("/predstaveni")}>
+                                    Zpět
+                                </button>
                             </div>
                         </div>
                     </div>

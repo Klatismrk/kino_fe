@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import moment from "moment";
 
-function ListRezervace() {
+function ListRezervace(props) {
     const [entity, setEntity] = useState([]);
+    const prihlasen = props.prihlasen;
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/rezervace')
+        axios.get('http://localhost:8080/api/rezervace', {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -18,7 +23,11 @@ function ListRezervace() {
     }, []);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/rezervace/${entityId}`)
+        axios.delete(`http://localhost:8080/api/rezervace/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 setEntity(prevState => prevState.filter(p => p.id !== entityId));
             })
@@ -42,9 +51,9 @@ function ListRezervace() {
                                 Datum: {moment(rezervace.predstaveni?.datum).format('DD.MM.YYYY HH:mm')}<br/>
                                 Místo: {rezervace.misto}
                             </p>
-                            <button className="btn btn-danger" onClick={() => deleteEntity(rezervace.id)}>
+                            { (prihlasen === "admin" || prihlasen === "uzivatel") && <button className="btn btn-danger" onClick={() => deleteEntity(rezervace.id)}>
                                 Smazat
-                            </button>
+                            </button>}
                         </div>
                     </div>
                 </div>

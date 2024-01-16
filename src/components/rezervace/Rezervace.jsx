@@ -1,14 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import ListRezervace from "./ListRezervace";
 
-export default function Rezervace() {
-
-    const [zobrazeni, setZobrazeni] = useState("list");
-
-    const zmenZobrazeni = (hodnota) => {
-        setZobrazeni(hodnota);
-    };
+export default function Rezervace(props) {
+    const prihlasen = props.prihlasen;
 
     return (
         <>
@@ -18,7 +13,7 @@ export default function Rezervace() {
                         <div className={"card"}>
                             <div className={"card-body text-center"}>
                                 <h2 className={""}>Rezervace</h2>
-                                {zobrazeni === "list" && <ListRezervace/>}
+                                <ListRezervace prihlasen={prihlasen} />
                             </div>
                         </div>
                     </div>

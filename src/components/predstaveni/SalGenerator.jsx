@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import { jwtDecode as jwt_decode } from 'jwt-decode';
 
-function SedadlaGenerator({ pocetRad, pocetSloupcu, predstaveniId }) {
+function SedadlaGenerator({ pocetRad, pocetSloupcu, predstaveniId, prihlasen }) {
     const [vybraneSedadlo, setVybraneSedadlo] = useState("");
     const [uzivatele, setUzivatele] = useState([]);
     const [uzivatel, setUzivatel] = useState("");
     const [misto, setMisto] = useState("");
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/uzivatel')
-            .then(response => setUzivatele(response.data))
-            .catch(error => console.error('Chyba při načítání uživatelů', error));
+        if (prihlasen === "admin") {
+            axios.get('http://localhost:8080/api/uzivatel', {
+                headers: {
+                    Authorization: `Bearer ` + localStorage.getItem("token")
+                }
+            })
+                .then(response => setUzivatele(response.data))
+                .catch(error => console.error('Chyba při načítání uživatelů', error));
+        } else {
+            setUzivatel(jwt_decode(localStorage.getItem("token")).id);
+        }
     }, []);
 
     const handleAddEntity = () => {
@@ -22,6 +31,7 @@ function SedadlaGenerator({ pocetRad, pocetSloupcu, predstaveniId }) {
         const newEntity = {
             uzivatel: {
                 id: uzivatel,
+                role: "ROLE_UZIVATEL", // Absolutně nechápu proč to bez téhle řádky dává 403 stejně si to podle ID mění na admina klidně
             },
             predstaveni: {
                 id: predstaveniId,
@@ -31,7 +41,11 @@ function SedadlaGenerator({ pocetRad, pocetSloupcu, predstaveniId }) {
 
         console.log('Odesílaný požadavek:', newEntity);
 
-        axios.post('http://localhost:8080/api/rezervace', newEntity)
+        axios.post('http://localhost:8080/api/rezervace', newEntity, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(response => {
                 console.log('Rezervace byla úspěšně vytvořena', response.data);
             })
@@ -88,13 +102,13 @@ function SedadlaGenerator({ pocetRad, pocetSloupcu, predstaveniId }) {
                     {sedadla}
                 </div>
                 <div className={"mb-3"}>
-                    <label className="form-label">Uživatelé:</label>
+                    {prihlasen === "admin" && <><label className="form-label">Uživatelé:</label>
                     <select className="form-select" value={uzivatel} onChange={(e) => setUzivatel(e.target.value)}>
                         <option value="" disabled>Vyberte uživatele</option>
                         {uzivatele.map(f => (
                             <option key={f.id} value={f.id}>{f.jmeno}</option>
                         ))}
-                    </select>
+                    </select></>}
                     <button className={"btn btn-primary"} type="button" onClick={() => handleAddEntity()}>
                         Vytvořit rezervaci
                     </button>

@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import axios from 'axios';
 
-function ListPredstaveni() {
+function ListPredstaveni(props) {
     const [entity, setEntity] = useState([]);
+    const prihlasen = props.prihlasen;
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/predstaveni')
+        axios.get('http://localhost:8080/api/predstaveni', {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -18,7 +23,11 @@ function ListPredstaveni() {
     }, []);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/predstaveni/${entityId}`)
+        axios.delete(`http://localhost:8080/api/predstaveni/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 setEntity(prevState => prevState.filter(p => p.id !== entityId));
             })
@@ -41,9 +50,9 @@ function ListPredstaveni() {
                                 </Link>
                             </h4>
                             <p>{predstaveni.film.popis}</p>
-                            <button className="btn btn-danger" onClick={() => deleteEntity(predstaveni.id)}>
+                            {prihlasen === "admin" && <button className="btn btn-danger" onClick={() => deleteEntity(predstaveni.id)}>
                                 Smazat
-                            </button>
+                            </button>}
                         </div>
                     </div>
                 </div>

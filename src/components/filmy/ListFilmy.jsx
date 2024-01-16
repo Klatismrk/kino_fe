@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-function ListFilmy() {
+function ListFilmy(props) {
     const [entity, setEntity] = useState([]);
+    const prihlasen = props.prihlasen;
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/film')
+        axios.get('http://localhost:8080/api/film', {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 const entity = res.data;
                 setEntity(entity);
@@ -17,7 +22,11 @@ function ListFilmy() {
     }, []);
 
     const deleteEntity = (entityId) => {
-        axios.delete(`http://localhost:8080/api/film/${entityId}`)
+        axios.delete(`http://localhost:8080/api/film/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ` + localStorage.getItem("token")
+            }
+        })
             .then(res => {
                 setEntity(prevState => prevState.filter(p => p.id !== entityId));
             })
@@ -38,9 +47,9 @@ function ListFilmy() {
                                 </Link>
                             </h4>
                             <p>{film.popis}</p>
-                            <button className="btn btn-danger" onClick={() => deleteEntity(film.id)}>
+                            {prihlasen === "admin" && <button className="btn btn-danger" onClick={() => deleteEntity(film.id)}>
                                 Smazat
-                            </button>
+                            </button>}
                         </div>
                     </div>
                 </div>

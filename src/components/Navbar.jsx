@@ -1,12 +1,24 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 
 function Navbar(props) {
 
     const [click, setClick] = useState(false);
+    const prihlasen = props.prihlasen;
+    const loggedIn = props.loggedIn;
+    const prihlasenId = props.prihlasenId;
+
     const handleClick = () => setClick(!click);
     const closeMobileMenu = () => setClick(false);
+    const handleLogout = () => {
+        localStorage.setItem('token', "");
+    };
+
+    useEffect(() => {
+        // Tato část kódu se spustí pokaždé, když se změní 'prihlasen'
+        console.log("Aktualizace Navbaru s prihlasen:", prihlasen);
+    }, [prihlasen]);
 
     return (
         <>
@@ -38,15 +50,41 @@ function Navbar(props) {
                         </Link>
                     </li>
                     <li className={"nav-item"}>
-                        <Link to={"/rezervace"} className={"nav-links"} onClick={closeMobileMenu}>
+                        {loggedIn && <Link to={"/rezervace"} className={"nav-links"} onClick={closeMobileMenu}>
                             Rezervace
-                        </Link>
+                        </Link>}
                     </li>
                     <li className={"nav-item"}>
-                        <Link to={"/uzivatele"} className={"nav-links"} onClick={closeMobileMenu}>
-                            Uživatelé
-                        </Link>
+                        {prihlasen === "admin" &&
+                            <Link to={"/uzivatele"} className={"nav-links"} onClick={closeMobileMenu}>
+                                Uživatelé
+                            </Link>}
                     </li>
+                    <li className={"nav-item"}>
+                        {prihlasen === "uzivatel" &&
+                            <Link to={"/uzivatel/" + prihlasenId} className={"nav-links"} onClick={closeMobileMenu}>
+                                Uživatel
+                            </Link>}
+                    </li>
+                    {!loggedIn && <li className={"nav-item"}>
+                        <Link to={"/prihlaseni"} className={"nav-links"} onClick={closeMobileMenu}>
+                            Přihlásit
+                        </Link>
+                    </li>}
+                    {!loggedIn && <li className={"nav-item"}>
+                        <Link to={"/registrace"} className={"nav-links"} onClick={closeMobileMenu}>
+                            Registrovat
+                        </Link>
+                    </li>}
+                    {loggedIn && <li className={"nav-item"}>
+                        <Link to={"/"} className={"nav-links"} onClick={() => {
+                            closeMobileMenu();
+                            handleLogout();
+                            props.logOff();
+                        }}>
+                            Odhlásit
+                        </Link>
+                    </li>}
                 </ul>
 
             </div>
